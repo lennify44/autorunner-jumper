@@ -11,3 +11,4 @@
 > # ***cool***
 
 ---
+claude hat sich den code angeschaut, keine zeile eigenständig verändert, und nennt sich dann "co-author"?
