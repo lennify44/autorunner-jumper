@@ -1,0 +1,13 @@
+# Lokale Editor-Einstellungen
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+
+# Hinweis: .venv/ braucht keinen Eintrag -- venv legt dort
+# selbst eine .gitignore mit "*" an.
+
+# Messdaten spaeter bewusst entscheiden:
+# Rohdaten gehoeren zur Arbeit und sollten mitversioniert werden,
+# solange sie klein bleiben. Deshalb hier NICHT ausgeschlossen.
