@@ -1,0 +1,26 @@
+x = PLAYER_X + (beat_time - t) * SCROLL_SPEED
+
+
+
+
+
+        x = PLAYER_X + (beat_time - t) * SCROLL_SPEED
+Die Kernzeile. Sie beantwortet: „Wo muss dieses Hindernis gerade stehen?"
+
+Rechnen wir sie einmal durch, für das erste Hindernis (beat_time = 2.0):
+
+┌───────┬───────────────┬─────────┬─────┐
+│   t   │ beat_time - t │ mal 300 │  x  │
+├───────┼───────────────┼─────────┼─────┤
+│ 0,0 s │ 2,0 s         │ 600 px  │ 800 │
+├───────┼───────────────┼─────────┼─────┤
+│ 1,0 s │ 1,0 s         │ 300 px  │ 500 │
+├───────┼───────────────┼─────────┼─────┤
+│ 1,5 s │ 0,5 s         │ 150 px  │ 350 │
+├───────┼───────────────┼─────────┼─────┤
+│ 2,0 s │ 0,0 s         │ 0 px    │ 200 │
+├───────┼───────────────┼─────────┼─────┤
+│ 2,5 s │ −0,5 s        │ −150 px │ 50  │
+└───────┴───────────────┴─────────┴─────┘
+
+Bei t = 2.0 steht x exakt auf PLAYER_X. Auf dem Beat, rechnerisch genau. Danach wird die Differenz negativ und das Hindernis wandert links an der Figur vorbei — ganz ohne Sonderbehandlung im Code.

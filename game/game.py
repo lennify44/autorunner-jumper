@@ -19,6 +19,7 @@ JUMP_DURATION = 2 * JUMP_VELOCITY / GRAVITY
 
 
 pygame.init() #startet die untersysteme
+font = pygame.font.SysFont(None, 32)
 t0 = time.perf_counter() # var ist zeit, an dem das script startete(perf_counter ist wie lange das OS schon läuft)
 screen=pygame.display.set_mode((WIDTH, HEIGHT)) #erstellt bild(auch alleine). var ist für verweis auf objekt. setmode braucht tupel, desshalb doppelte klammern.
 pygame.display.set_caption("Rhythmus-Autorunner")
@@ -31,6 +32,11 @@ for i in range(N_OBSTACLES):           #"für jedes obstacle"
 
 running = True
 jump_start = None   #am boden
+hits = 0
+hit_obstacles = set()  #ist menge ohne duplikate
+
+
+
 while running: # damit nicht unvollständig abgebrochen wird
     t = time.perf_counter() - t0 # t=wie lange es her ist bis das programm startete
 
@@ -60,7 +66,7 @@ while running: # damit nicht unvollständig abgebrochen wird
         else:
             player_y = GROUND_Y - height
 
-
+    player_rect = pygame.Rect(PLAYER_X, player_y - 40, 40, 40)
     screen.fill((18, 18, 22))             # farbcode(aka. RGB-Tupel) für farbe über ganzes bild
 
 
@@ -70,17 +76,22 @@ while running: # damit nicht unvollständig abgebrochen wird
     pygame.draw.line(screen, (60, 60, 70), (0, GROUND_Y), (WIDTH, GROUND_Y), 2)
 
     # Hindernisse
-    for beat_time in obstacle_times:
-        x = PLAYER_X + (beat_time - t) * SCROLL_SPEED     #main beweg teil von max. breite nach links(siehe unter code expl)
-        if -50 < x < WIDTH:
-            pygame.draw.rect(screen, (220, 80, 80), (x, GROUND_Y - 60, 30, 60))
+    for i, beat_time in enumerate(obstacle_times):
+        x = PLAYER_X + (beat_time - t) * SCROLL_SPEED #position
+        if -50 < x < WIDTH: #wenn im bildschirm
+            obstacle_rect = pygame.Rect(x, GROUND_Y - 60, 30, 60) #definiert das obstacle i
+            pygame.draw.rect(screen, (220, 80, 80), obstacle_rect) # malt das obstacle
+
+            if i not in hit_obstacles and player_rect.colliderect(obstacle_rect):   #.coliderect() gibt true beim
+                hits += 1
+                hit_obstacles.add(i)
 
     # Figur
-    pygame.draw.rect(screen, (235, 235, 240), (PLAYER_X, player_y - 40, 40, 40))           #pygame.draw.rect(screen, (235, 235, 240), (100, 300, 40, 40)) #farbe, dann (x, y, Breite, Höhe) wobei x,y zur linken oberen Ecke
+    pygame.draw.rect(screen, (235, 235, 240), player_rect)           #pygame.draw.rect(screen, (235, 235, 240), (100, 300, 40, 40)) #farbe, dann (x, y, Breite, Höhe) wobei x,y zur linken oberen Ecke
 
 
 
-
+    screen.blit(font.render(f"Treffer: {hits}", True, (200, 200, 210)), (20, 20))
     pygame.display.flip()                  # Gezeichnetes sichtbar machen
 
     clock.tick(FPS)                        # Begrenzt auf FPS (expl. unter ~/code-expl/clock.tick()), begrenzt gleichzeitig cpu auslastung

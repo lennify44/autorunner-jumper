@@ -1,0 +1,6 @@
+1. Aktuelle Uhrzeit ablesen
+2. Differenz zur gespeicherten Zeit des letzten Aufrufs bilden → so lange hat dieser Frame gedauert
+3. Zielzeit ist 1000/120 = 8,3 ms. Hat der Frame nur 2 ms gebraucht, bleiben 6,3 ms übrig
+4. 6,3 ms schlafen legen
+5. Neue Uhrzeit abspeichern für den nächsten Durchlauf
+6. Die vergangenen Millisekunden zurückgeben
