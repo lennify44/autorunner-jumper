@@ -124,3 +124,15 @@ wie Nutzt man random.seed()
 === 2026-09-09T11:21:28Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
 wie würde man die schleife für das muster schreiben
 
+=== 2026-09-09T21:05:10Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+Wie setzt man musik in mein spiel ein?
+
+=== 2026-09-09T21:19:27Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+man kann durch pygame.key.set_repeat(50, 10) gedrückt halten
+
+=== 2026-09-09T21:34:51Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+wie verlinke ich einen path. ich habe pathlib.Path(__path__) aisprobiert, aber ich glaube die muskausgabe scheitert gerade daran
+
+=== 2026-09-09T21:42:03Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+die musik laüft immernoch nicht
+

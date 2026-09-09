@@ -1,6 +1,7 @@
 import pygame
 import time
 import random
+from pathlib import Path
 #Fenster erstellen
 
 
@@ -12,26 +13,29 @@ SECONDS_PER_BEAT = 60 / BPM     # 0,5 s bei 120 BPM, eif formatierung
 PLAYER_X = 200                  # feste Position der Figur 
 GROUND_Y = 380                  # Hoehe des Bodens
 LEAD_IN_BEATS = 16               # beats vor dem ersten Hindernis
-N_OBSTACLES = 44           #anzahl obstacles
-AUDIO_OFFSET = 0.0              # +=früher;-=später;in sec.
+# N_OBSTACLES = 88         #anzahl obstacle-slots
+AUDIO_OFFSET = 0.0              # +=später;-=früher;in sec.
 JUMP_VELOCITY = 1000           # Startgeschwindigkeit nach oben, Pixel/s
 GRAVITY = 4000                # Beschleunigung nach unten, Pixel/s²
 OBSTACLE_EVERY_N_BEATS = 1    # Hindernis nur auf jedem zweiten Beat
 JUMP_DURATION = 2 * JUMP_VELOCITY / GRAVITY
 LEVEL_SEED = 42
 SLOT_BEATS = 1
-GAP_CHOICES = [1, 2, 2, 2, 3]
-MUSIC_END = 48.0
+GAP_CHOICES = [2, 2, 2, 4, 4]
+MUSIC_END = 60.0
+MUSIC_PATH = Path(__file__).parent / "game_music.wav"
 
+pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512) # bereitet die einstellungen vor; muss vor init() weil der die fest macht
 rng = random.Random(LEVEL_SEED)
 pygame.init() #startet die untersysteme
 font = pygame.font.SysFont(None, 32)
-t0 = time.perf_counter() # var ist zeit, an dem das script startete(perf_counter ist wie lange das OS schon läuft)
 screen=pygame.display.set_mode((WIDTH, HEIGHT)) #erstellt bild(auch alleine). var ist für verweis auf objekt. setmode braucht tupel, desshalb doppelte klammern.
 pygame.display.set_caption("Rhythmus-Autorunner")
 clock = pygame.time.Clock()
 obstacle_times = [] #eckige klammer is ne liste
+music = pygame.mixer.Sound(str(MUSIC_PATH)) #gibt die musik-quelle an
 slot = 0
+
 
 while True:
     beat = LEAD_IN_BEATS + slot * SLOT_BEATS #berechnet beat
@@ -42,6 +46,8 @@ while True:
     slot += rng.choice(GAP_CHOICES) #geht zur nächsten rand. stelle
 # fügt verschiedene stellen hinzu, wo obst. auftauchen
 
+music.play()
+t0 = time.perf_counter() - AUDIO_OFFSET + 0.6 # var ist zeit, an dem das script startete(perf_counter ist wie lange das OS schon läuft)
 running = True
 jump_start = None   #am boden
 hits = 0
@@ -89,7 +95,7 @@ while running: # damit nicht unvollständig abgebrochen wird
     # Boden
     pygame.draw.line(screen, (60, 60, 70), (0, GROUND_Y), (WIDTH, GROUND_Y), 2)
 
-    # Hindernisse
+    # Hindernisse schreiben
     for i, beat_time in enumerate(obstacle_times):
         x = PLAYER_X + (beat_time - t) * SCROLL_SPEED #position
         obstacle_rect = pygame.Rect(x, GROUND_Y - 60, 30, 60) #definiert das obstacle i
