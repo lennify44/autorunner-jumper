@@ -16,7 +16,7 @@ LOCAL = ZoneInfo("Europe/Berlin")
 
 
 def sessions():
-    """Alle Transkriptdateien, neueste zuerst."""
+    # Alle Transkriptdateien, neueste zuerst
     files = [p for p in PROJECTS.rglob("*.jsonl") if "subagents" not in p.parts]
     return sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)
 
@@ -30,7 +30,7 @@ def records(path):
 
 
 def text_of(message):
-    """Der Inhalt ist entweder ein String oder eine Liste typisierter Bloecke."""
+    # Der Inhalt ist entweder ein String oder eine Liste typisierter Bloecke
     content = message.get("content", "")
     if isinstance(content, str):
         return content

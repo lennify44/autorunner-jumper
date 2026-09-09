@@ -82,9 +82,9 @@ while running: # damit nicht unvollständig abgebrochen wird
             obstacle_rect = pygame.Rect(x, GROUND_Y - 60, 30, 60) #definiert das obstacle i
             pygame.draw.rect(screen, (220, 80, 80), obstacle_rect) # malt das obstacle
 
-            if i not in hit_obstacles and player_rect.colliderect(obstacle_rect):   #.coliderect() gibt true beim
-                hits += 1
-                hit_obstacles.add(i)
+        if i not in hit_obstacles and player_rect.colliderect(obstacle_rect):   #.coliderect() gibt true beim
+            hits += 1
+            hit_obstacles.add(i)
 
     # Figur
     pygame.draw.rect(screen, (235, 235, 240), player_rect)           #pygame.draw.rect(screen, (235, 235, 240), (100, 300, 40, 40)) #farbe, dann (x, y, Breite, Höhe) wobei x,y zur linken oberen Ecke
