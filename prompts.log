@@ -136,3 +136,18 @@ wie verlinke ich einen path. ich habe pathlib.Path(__path__) aisprobiert, aber i
 === 2026-09-09T21:42:03Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
 die musik laüft immernoch nicht
 
+=== 2026-09-10T08:29:07Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+wie baut man ein Menü in so ein pygame ein?
+
+=== 2026-09-10T09:13:48Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+erkläre neue aspekte. außerdem weiß ich nicht, wie ich   "File "/home/Franz/rhythm-study/game/game.py", line 33, in <module>
+    title_font = pygame.font.SysFont(None, 64) # Font size von Menu
+  File "/home/Franz/rhythm-study/.venv/lib64/python3.14/site-packages/pygame/sysfont.py", line 514, in SysFont
+    return constructor(fontname, size, set_bold, set_italic)
+  File "/home/Franz/rhythm-study/.venv/lib64/python3.14/site-packages/pygame/sysfont.py", line 390, in font_constructor
+    font = Font(fontpath, size)
+pygame.error: font not initialized" löse
+
+=== 2026-09-10T09:34:55Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+das menü zeigt keine schrift an weist du warum?
+

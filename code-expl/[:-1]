@@ -1,0 +1,13 @@
+Slicing
+
+participant_id = participant_id[:-1]
+
+Die eckigen Klammern schneiden ein Stück aus einer Sequenz: [start:ende]. Beide Angaben sind optional, negative Zahlen zählen von hinten.
+
+"1234"[:-1]   ->  "123"     alles außer dem letzten
+"1234"[1:]    ->  "234"     ab dem zweiten
+"1234"[1:3]   ->  "23"      vom zweiten bis vor den vierten
+
+[:-1] heißt also „von Anfang bis ausschließlich das letzte Zeichen" — genau das, was Backspace tut.
+
+Funktioniert bei Strings und Listen gleichermaßen. Dein obstacle_times[-1] in der Abbruchbedingung ist derselbe Mechanismus ohne Doppelpunkt: nur das letzte Element.
