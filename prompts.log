@@ -151,3 +151,33 @@ pygame.error: font not initialized" löse
 === 2026-09-10T09:34:55Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
 das menü zeigt keine schrift an weist du warum?
 
+=== 2026-09-11T09:31:08Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+ich habe eine datenbank eingebaut aber ich glaube das spiel gibt einen blackscreen wenn es zeile 189 erreicht
+
+=== 2026-09-11T10:01:24Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+er zeigt den endbildschirm, aber es entstehen keine neuen einträge
+
+=== 2026-09-11T10:38:04Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+die DB wird immer wieder Locked. warum?
+
+=== 2026-09-11T11:43:46Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+ich habe mehrere sachen versucht aber schaffe es trotzdem nicht. es funktioniert nicht
+
+=== 2026-09-11T12:07:54Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+es funktioniert jetzt, danke. wie erstelle ich den das messgerät sodass es die verzögerung von dem sprung des probanten messen kann, wie du zuvor erwähnt hast?
+
+=== 2026-09-11T12:25:17Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+ich glaube deine berechnung von 263 ms ist falsch. wenn ich den audio-offset auf +0.263 treffe ich, wenn ich mit dem beat springe, jedes mal das hindernis
+
+=== 2026-09-11T12:25:44Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+ich glaube deine berechnung von 263 ms ist falsch. wenn ich den audio-offset auf +0.263 treffe ich, wenn ich mit dem beat springe, jedes mal das hindernis
+
+=== 2026-09-11T12:33:47Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+ich berühre jedes mal das hindernis bei + 263 ms, also ist es ein hit
+
+=== 2026-09-11T15:10:06Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+loggt der message logger nur nachrichten in diesem chat?
+
+=== 2026-09-11T15:12:17Z session=b4854a3d-f267-4b46-8f8a-7ea9da023a30
+ok
+
