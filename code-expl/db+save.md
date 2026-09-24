@@ -32,25 +32,26 @@ CREATE TABLE IF NOT EXISTS obstacles (
 
 
 
-def save_run():
-conn, cursor = connect()
-cursor.execute(
-    """INSERT INTO runs (participant, offset_s, seed, bpm, started_at, hits)
-       VALUES (?, ?, ?, ?, ?, ?)""",
-    (participant_id, AUDIO_OFFSET, LEVEL_SEED, BPM,
-     datetime.now().isoformat(timespec="seconds"), hits)
-)
-run_id = cursor.lastrowid
-cursor.executemany(
-    "INSERT INTO presses (run_id, t_press, effective) VALUES (?, ?, ?)",
-    [(run_id, tp, int(eff)) for tp, eff in presses]
-)
-cursor.executemany(
-    "INSERT INTO obstacles (run_id, idx, beat_time, hit) VALUES (?, ?, ?, ?)",
-    [(run_id, i, bt, int(i in hit_obstacles)) for i, bt in enumerate(obstacle_times)]
-)
-conn.commit()
-conn.close()
+```
+def save_run(): # ganz viel in code-expl
+    conn, cursor = connect()
+    cursor.execute(
+        """INSERT INTO runs (participant, offset, seed, bpm, time_started, hits) VALUES (?, ?, ?, ?, ?, ?)""", 
+        (participant_id, AUDIO_OFFSET, LEVEL_SEED, BPM, 
+         datetime.now().isoformat(timespec="seconds"), hits)
+    )
+    run_id = cursor.lastrowid
+
+    cursor.executemany( # schreibt mehrere zeilen auf einmal
+        "INSERT INTO presses (run_id, t_press, effective) VALUES (?, ?, ?)",
+        [(run_id, tp, int(eff)) for tp, eff in presses]   #[(a, b, c) for-schleife]; for a, b in... macht tupel-entpackung
+    )
+    cursor.executemany(
+        "INSERT INTO obstacles (run_id, idx, beat_time, hit) VALUES (?, ?, ?, ?)",
+        [(run_id, i, bt, int(i in hit_obstacles)) for i, bt in enumerate(obstacle_times)] # i-teil: checkt bei enumerate(obstacle_times)[nr., beat] ob nr. in hit_obstacles ist
+    )  
+    """enumerate() macht so aus obstacle_times=[a, v, s] [(0, a), (1, v), (2, s)]"""
+```3
 
 Eine List Comprehension ist nur eine Kurzschreibweise für eine Schleife mit append
 
@@ -80,29 +81,23 @@ Das ist wahrscheinlich der verwirrende Punkt. Zwei Namen hinter for:
 
 for tp, eff in presses:
 
-presses enthält Paare wie (4.03, True). Schreibst du einen Namen, bekommst du das ganze Paar:
+**presses enthält Paare wie (4.03, True). Schreibst du einen Namen, bekommst du das ganze Paar:
 
-p = (4.03, True)   ->  p[0]=4.03  p[1]=True
-
-Schreibst du zwei, teilt Python das Paar automatisch auf:
-
-tp=4.03  eff=True
-
-Das heißt Tupel-Entpacken und funktioniert überall, nicht nur in Schleifen. WIDTH, HEIGHT = 960, 540 ganz oben in deiner Datei ist dasselbe Prinzip, und conn, cursor = connect() auch.
-
-
-
-p = (4.03, True)   ->  p[0]=4.03  p[1]=True
-
-Schreibst du zwei, teilt Python das Paar automatisch auf:
-
-Die obstacles-Zeile
+p = (4.03, True)   ->  p[0]=4.03  p[1]=True**
 
 Schreibst du zwei, teilt Python das Paar automatisch auf:
 
 tp=4.03  eff=True
 
 Das heißt Tupel-Entpacken und funktioniert überall, nicht nur in Schleifen. WIDTH, HEIGHT = 960, 540 ganz oben in deiner Datei ist dasselbe Prinzip, und conn, cursor = connect() auch.
+
+
+
+p = (4.03, True)   ->  p[0]=4.03  p[1]=True
+
+Schreibst du zwei, teilt Python das Paar automatisch auf:
+
+tp=4.03  eff=True
 
 Die obstacles-Zeile
 
