@@ -10,7 +10,9 @@ import statistics
 
 STATE_MENU, STATE_PRACTICE, STATE_BREAK, STATE_RUNNING, STATE_DONE, STATE_CALIBRATE = "menu", "practice", "break", "running", "done", "calibrate"
 
-MUTE=True
+DEBUG = True
+
+MUTE=False
 BLUETOOTH = True
 TEXT_COLOR = (235, 235, 240)
 DIM_COLOR = (120, 120, 135)
@@ -41,7 +43,7 @@ CALIB_COUNTIN_BEATS = 24               # bis Takt 7, wo der Beat einsetzt
 CALIB_TAP_BEATS = 16
 MUSIC_PATH = Path(__file__).parent / "game_music.wav"
 DB_PATH = Path(__file__).parent / "auto-save.sqlite"
-
+PRACTICE_TIMES = 2 #wie oft practice ist
 # berechnet den optimalpunkt zum springen
 def jump_lead_calc():
     """wie weit vor der Ankunft gedrückt werden muss."""
@@ -102,6 +104,7 @@ presses=[]
 
 
 
+
 #alles auf werkseinstellung und run starten
 def start_run():
     """startet das spiel"""
@@ -109,7 +112,7 @@ def start_run():
     music.stop()
     if MUTE == False:
         music.play()
-    t0 = time.perf_counter() - current_offset + bluetooth_offset # JUMP_LEAD damit der beat nicht genau über obst spielt sondern wann man drücken soll  # var ist zeit, an dem das script startete(perf_counter ist wie lange das OS schon läuft)
+    t0 = time.perf_counter() - current_offset + bluetooth_offset - JUMP_LEAD # JUMP_LEAD damit der beat nicht genau über obst spielt sondern wann man drücken soll  # var ist zeit, an dem das script startete(perf_counter ist wie lange das OS schon läuft)
     hits = 0
     jump_start = None
     hit_obstacles = set()  #ist menge ohne duplikate
@@ -126,12 +129,16 @@ def connect():
     return conn, cursor
 conn, cursor = connect()
 
+cursor.execute("SELECT count(DISTINCT participant) FROM runs")
+participant_count = cursor.fetchone()[0]
+
 def save_run(): # ganz viel in code-expl
+    global participant_count
     conn, cursor = connect()
-    cursor.execute("""INSERT INTO runs (participant, offset, seed, bpm, time_started, hits, position, calib_offset, calib_sd, jump_lead)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+    cursor.execute("""INSERT INTO runs (participant, offset, seed, bpm, time_started, hits, position, calib_offset, calib_sd, jump_lead, run_nr)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (participant_id, current_offset, LEVEL_SEED, BPM,
-         datetime.now().isoformat(timespec="seconds"), hits, condition_index, calib_offset, calib_sd, JUMP_LEAD)
+         datetime.now().isoformat(timespec="seconds"), hits, condition_index, calib_offset, calib_sd, JUMP_LEAD, run_count)
     )
     run_id = cursor.lastrowid
 
@@ -144,6 +151,9 @@ def save_run(): # ganz viel in code-expl
         [(run_id, i, bt, int(i in hit_obstacles)) for i, bt in enumerate(obstacle_times)] # i-teil: checkt bei enumerate(obstacle_times)[nr., beat] ob nr. in hit_obstacles ist
     )  
     """enumerate() macht so aus obstacle_times=[a, v, s] [(0, a), (1, v), (2, s)]"""
+    print(f"gespeichert: run {run_id}, VP {participant_id}, offset {current_offset}")
+    cursor.execute("SELECT count(DISTINCT participant) FROM runs") # nur QoL für part. count in menu
+    participant_count = cursor.fetchone()[0]
     conn.commit()
     conn.close()
 
@@ -169,6 +179,10 @@ running = True
 conditions = []
 condition_index = 0
 current_offset = 0.0
+calib_offset = None
+calib_sd = None
+practices = 0
+run_count = 0
 
 
 
@@ -216,10 +230,14 @@ while running: # damit nicht unvollständig abgebrochen wird
                 presses.append((t, jump_start is None))    # jumpstart is None -> ergebnis ist true/false
                 if jump_start is None:          # nur springen, wenn am Boden
                     jump_start = t
-
+            elif DEBUG and state in (STATE_PRACTICE, STATE_RUNNING) and event.key == pygame.K_s:
+                t0 -= 100          # Zeit vorspulen zu ende
             elif state == STATE_BREAK and event.key == pygame.K_RETURN:
                 current_offset = conditions[condition_index]
-                state = STATE_RUNNING
+                if practices >= PRACTICE_TIMES:
+                    state = STATE_RUNNING
+                else:
+                    state = STATE_PRACTICE
                 start_run()
 
             elif state == STATE_DONE and event.key == pygame.K_RETURN:
@@ -228,11 +246,7 @@ while running: # damit nicht unvollständig abgebrochen wird
             
 
     if state == STATE_MENU:
-        # conn, cursor = connect()
-        cursor.execute("SELECT count(DISTINCT participant) FROM runs")
-        count = cursor.fetchone()[0]
-        # conn.close()
-        draw_text(str(count), font, DIM_COLOR, 0, 0)
+        draw_text(str(participant_count), font, DIM_COLOR, 0, 0)
         draw_text("Rhythmus-Autorunner", title_font, TEXT_COLOR, 80, 150)
         draw_text("Versuchsperson: "+ str(participant_id), font, TEXT_COLOR, 80, 260)
         draw_text("Ziffern eingeben         Enter zum starten", font, DIM_COLOR, 80, 310)
@@ -259,9 +273,10 @@ while running: # damit nicht unvollständig abgebrochen wird
             state = STATE_MENU
 
     elif state in (STATE_RUNNING, STATE_PRACTICE): # in checkt so listen,ist kürzer
-
-        ######game-code anfang
-
+        
+        
+        
+        """game-code anfang"""
 
         t = time.perf_counter() - t0 # t=wie lange es her ist bis das game startete
         #
@@ -309,10 +324,12 @@ while running: # damit nicht unvollständig abgebrochen wird
         
 
         # checkt so ob das spiel zuende ist
-        if t > obstacle_times[-1] + 7:
+        if t > obstacle_times[-1] + 8:
+            run_count += 1
             music.stop()
             if state == STATE_PRACTICE:
                 state = STATE_BREAK
+                practices += 1
             else:
                 save_run()
                 condition_index += 1
@@ -320,11 +337,15 @@ while running: # damit nicht unvollständig abgebrochen wird
     if state == STATE_DONE:
         draw_text("Test beendet", title_font, TEXT_COLOR, 80, 200)
         draw_text(f"Versuchsperson {participant_id} — {hits} Treffer", font, DIM_COLOR, 80, 290)
-        draw_text("Bitte nicht enter drücken", font, DIM_COLOR,80, 310)
+        draw_text("Bitte auf Anweisungen warten", font, DIM_COLOR,80, 310)
     elif state == STATE_BREAK:
         draw_text("Pause", title_font, TEXT_COLOR, 80, 180)
-        draw_text(f"Durchgang {condition_index + 1} von {len(conditions)}",
-                  font, TEXT_COLOR, 80, 270)
+        if practices >= PRACTICE_TIMES:
+            draw_text(f"Als nächstes: Durchgang {condition_index + 1} von {len(conditions)}",
+                      font, TEXT_COLOR, 80, 270)
+        else:
+            draw_text(f"Als nächstes: Übung {practices + 1} von {PRACTICE_TIMES}",
+                      font, TEXT_COLOR, 80, 270)
         draw_text("Enter startet den nächsten Durchgang", font, DIM_COLOR, 80, 320)
         
 

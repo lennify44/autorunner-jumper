@@ -1,7 +1,7 @@
 """veraltet"""
 import sqlite3
 from pathlib import Path
-DB_PATH = Path(__file__).parent / "auto-save.sqlite"
+DB_PATH = Path(__file__).parent.parent / "game" / "auto-save.sqlite"
 def connect():
     conn=sqlite3.connect(str(DB_PATH))
     cursor=conn.cursor()
@@ -15,31 +15,15 @@ def connect():
 
 
 def delete():
+    cursor.execute("DELETE FROM obstacles")
     cursor.execute("DELETE FROM runs")
+    cursor.execute("DELETE FROM presses")
+
 
 
 conn, cursor = connect()
-cursor.executescript('''CREATE TABLE IF NOT EXISTS runs (
-run_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-participant TEXT,
-offset    REAL,
-seed        INTEGER,
-bpm         INTEGER,
-time_started  TEXT,
-hits        INTEGER
-);
 
-CREATE TABLE IF NOT EXISTS presses (
-    run_id    INTEGER,
-    t_press   REAL,
-    effektiv INTEGER
-);
-
-CREATE TABLE IF NOT EXISTS obstacles (
-    run_id    INTEGER,
-    idx       INTEGER,
-    beat_time REAL,
-    hit       INTEGER
-);''')
+###delete()
+# cursor.execute('ALTER TABLE runs ADD COLUMN "run_nr" INTEGER')
 conn.commit()
 conn.close()

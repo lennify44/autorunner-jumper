@@ -39,11 +39,11 @@ runs, presses, obstacles = lade()
 einzeln = pd.concat([ordne_zu(rid, obstacles, presses) for rid in runs.run_id],
                     ignore_index=True)
 einzeln = einzeln.merge(
-    runs[["run_id", "participant", "offset", "position", "calib_offset"]], on="run_id")
+    runs[["run_nr", "run_id", "participant", "offset", "position", "calib_offset"]], on="run_id")
 
 einzeln["korrigiert"] = einzeln.abweichung - einzeln.calib_offset.fillna(0.0)
 
-per_run = einzeln.groupby(["run_id", "participant", "offset"]).agg(
+per_run = einzeln.groupby(["run_nr", "run_id", "participant", "offset"]).agg(
     hindernisse=("idx", "count"),
     zugeordnet=("abweichung", "count"),
     median_ms=("korrigiert", lambda s: s.median() * 1000),
