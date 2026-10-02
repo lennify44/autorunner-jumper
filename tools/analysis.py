@@ -52,7 +52,7 @@ per_run = einzeln.groupby(["run_nr", "run_id", "participant", "offset"]).agg(
 ).reset_index()
 per_run["ausgelassen"] = per_run.hindernisse - per_run.zugeordnet
 
-print(per_run.to_string(index=False, float_format=lambda v: f"{v:.1f}"))
+print(per_run.to_string(index=False, float_format=lambda v: f"{v:.3f}"))
 doppelt = per_run.groupby(["participant", "offset"]).size()
 doppelt = doppelt[doppelt > 1]
 if len(doppelt):

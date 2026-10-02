@@ -178,7 +178,7 @@ hit_obstacles = set()
 running = True
 conditions = []
 condition_index = 0
-current_offset = 0.0
+current_offset = 0
 calib_offset = None
 calib_sd = None
 practices = 0
@@ -198,7 +198,7 @@ while running: # damit nicht unvollständig abgebrochen wird
 
     #event-horizon
     for event in pygame.event.get(): #event ist ne var event.get() ist die liste. kann mehrmals pro tick abarbeiten, weil clock.tick extra steht
-        
+        print(practices)
         if event.type == pygame.QUIT: #event.type ist immer ein attribut aus dem anstehenden event. QUIT ist wenn geschlossen wird
             running = False
 
@@ -334,6 +334,9 @@ while running: # damit nicht unvollständig abgebrochen wird
                 save_run()
                 condition_index += 1
                 state = STATE_DONE if condition_index >= len(conditions) else STATE_BREAK
+        if DEBUG == True:
+            draw_text(str(current_offset), font, TEXT_COLOR, 0, 80)
+
     if state == STATE_DONE:
         draw_text("Test beendet", title_font, TEXT_COLOR, 80, 200)
         draw_text(f"Versuchsperson {participant_id} — {hits} Treffer", font, DIM_COLOR, 80, 290)

@@ -24,6 +24,6 @@ def delete():
 conn, cursor = connect()
 
 ###delete()
-# cursor.execute('ALTER TABLE runs ADD COLUMN "run_nr" INTEGER')
+cursor.execute('ALTER TABLE runs MODIFY "offset" FLOAT')
 conn.commit()
 conn.close()
