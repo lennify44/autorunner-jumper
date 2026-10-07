@@ -10,10 +10,10 @@ import statistics
 
 STATE_MENU, STATE_PRACTICE, STATE_BREAK, STATE_RUNNING, STATE_DONE, STATE_CALIBRATE = "menu", "practice", "break", "running", "done", "calibrate"
 
-DEBUG = True
+DEBUG = False
 
 MUTE=False
-BLUETOOTH = True
+BLUETOOTH = False
 TEXT_COLOR = (235, 235, 240)
 DIM_COLOR = (120, 120, 135)
 WIDTH, HEIGHT = 960, 540 #genau 1/4 von FHD; passt auf jeden bildschirm
@@ -198,7 +198,6 @@ while running: # damit nicht unvollständig abgebrochen wird
 
     #event-horizon
     for event in pygame.event.get(): #event ist ne var event.get() ist die liste. kann mehrmals pro tick abarbeiten, weil clock.tick extra steht
-        print(practices)
         if event.type == pygame.QUIT: #event.type ist immer ein attribut aus dem anstehenden event. QUIT ist wenn geschlossen wird
             running = False
 
@@ -233,9 +232,9 @@ while running: # damit nicht unvollständig abgebrochen wird
             elif DEBUG and state in (STATE_PRACTICE, STATE_RUNNING) and event.key == pygame.K_s:
                 t0 -= 100          # Zeit vorspulen zu ende
             elif state == STATE_BREAK and event.key == pygame.K_RETURN:
-                current_offset = conditions[condition_index]
                 if practices >= PRACTICE_TIMES:
                     state = STATE_RUNNING
+                    current_offset = conditions[condition_index]
                 else:
                     state = STATE_PRACTICE
                 start_run()

@@ -24,6 +24,5 @@ def delete():
 conn, cursor = connect()
 
 ###delete()
-cursor.execute('ALTER TABLE runs MODIFY "offset" FLOAT')
 conn.commit()
 conn.close()
