@@ -11,8 +11,9 @@
 ### Menu
 
 - zahlen eingeben für nummerierte testpersonen
+- K für die Kalibrierung (bei jeder Person neu)
 - Enter zum starten
-- **ohne eingegebene Zahlen kann man nicht starten**
+- **ohne eingegebene Zahlen und ohne Kalibrierung kann man nicht starten**
 
 ### Game
 

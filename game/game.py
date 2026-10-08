@@ -84,7 +84,7 @@ def start_calib():
 participant_id = ""
 bluetooth_offset = 0
 if BLUETOOTH:
-    bluetooth_offset=-0.2
+    bluetooth_offset=0.2 # ton kommt spaeter an, also muss das spiel auch spaeter laufen
 pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512) # bereitet die einstellungen vor; muss vor init() weil der die fest macht
 rng = random.Random(LEVEL_SEED)          #Level
 pygame.init() #startet die untersysteme
@@ -112,7 +112,7 @@ def start_run():
     music.stop()
     if MUTE == False:
         music.play()
-    t0 = time.perf_counter() - current_offset + bluetooth_offset - JUMP_LEAD # JUMP_LEAD damit der beat nicht genau über obst spielt sondern wann man drücken soll  # var ist zeit, an dem das script startete(perf_counter ist wie lange das OS schon läuft)
+    t0 = time.perf_counter() - current_offset + bluetooth_offset + JUMP_LEAD # JUMP_LEAD damit der beat nicht genau über obst spielt sondern wann man drücken soll  # var ist zeit, an dem das script startete(perf_counter ist wie lange das OS schon läuft)
     hits = 0
     jump_start = None
     hit_obstacles = set()  #ist menge ohne duplikate
@@ -211,10 +211,11 @@ while running: # damit nicht unvollständig abgebrochen wird
                     participant_id += event.unicode   
                 elif event.key == pygame.K_BACKSPACE:
                     participant_id = participant_id[:-1] # siehe code expl
-                elif event.key == pygame.K_RETURN and participant_id != "":
+                elif event.key == pygame.K_RETURN and participant_id != "" and calib_offset is not None: # ohne kalibrierung kein start
                     conditions = OFFSETS[:]   #[:] macht kopie der liste damit nix kapputt
                     random.Random(int(participant_id)).shuffle(conditions) # macht shuffle
                     condition_index = 0
+                    practices = 0 # sonst hat ab der 2. person nur noch 1 uebung
                     current_offset = PRACTICE_OFFSET
                     state = STATE_PRACTICE
                     start_run()
@@ -241,6 +242,8 @@ while running: # damit nicht unvollständig abgebrochen wird
 
             elif state == STATE_DONE and event.key == pygame.K_RETURN:
                 participant_id = ""
+                calib_offset = None # sonst wird die kalibrierung von der person davor gespeichert
+                calib_sd = None
                 state = STATE_MENU
             
 
@@ -249,6 +252,7 @@ while running: # damit nicht unvollständig abgebrochen wird
         draw_text("Rhythmus-Autorunner", title_font, TEXT_COLOR, 80, 150)
         draw_text("Versuchsperson: "+ str(participant_id), font, TEXT_COLOR, 80, 260)
         draw_text("Ziffern eingeben         Enter zum starten", font, DIM_COLOR, 80, 310)
+        draw_text(f"K = Kalibrierung ({'fertig' if calib_offset is not None else 'fehlt noch'})", font, DIM_COLOR, 80, 350)
     
     
     
