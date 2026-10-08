@@ -1,6 +1,9 @@
 # coole readme
 
+## externe Libraries
 
+- pygame
+- panda
 
 #### Man sollte das nicht mit bluetooth wegen 150-250ms latenz spielen!
 
