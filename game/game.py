@@ -10,7 +10,7 @@ import statistics
 
 STATE_MENU, STATE_PRACTICE, STATE_BREAK, STATE_RUNNING, STATE_DONE, STATE_CALIBRATE = "menu", "practice", "break", "running", "done", "calibrate"
 
-DEBUG = False
+DEBUG = True
 
 MUTE=False
 BLUETOOTH = False

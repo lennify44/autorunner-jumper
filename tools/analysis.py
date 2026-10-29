@@ -52,6 +52,7 @@ per_run = einzeln.groupby(["run_nr", "run_id", "participant", "offset"]).agg(
 ).reset_index()
 per_run["ausgelassen"] = per_run.hindernisse - per_run.zugeordnet
 
+
 print(per_run.to_string(index=False, float_format=lambda v: f"{v:.3f}"))
 doppelt = per_run.groupby(["participant", "offset"]).size()
 doppelt = doppelt[doppelt > 1]
@@ -59,3 +60,16 @@ if len(doppelt):
     print()
     print("Achtung, mehrfach erhoben:")
     print(doppelt.to_string())
+
+
+einzeln["drittel"] = pd.cut(einzeln.idx, 3, labels=["Anfang", "Mitte", "Ende"])
+run_id = input("von welchem Run willst du den Verlauf sehen?(run_id):")
+obs_per_run = einzeln[einzeln.run_id == run_id]
+verlauf = obs_per_run.groupby(["offset", "drittel"], observed=True).korrigiert.agg(
+    median_ms=lambda s: s.median() * 1000,
+    streuung_ms=lambda s: s.std() * 1000,
+    n="count",
+).reset_index()
+
+
+print(verlauf.to_string(index=False, float_format=lambda v: f"{v:.1f}"))
