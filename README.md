@@ -31,6 +31,18 @@
 - unter tools.
 - ändert sich die spielphysik, muss JUMP_LEAD verändert werden.
 
+## Einstellungen (config.toml)
+
+- alle Konstanten (FPS, Physik, Offsets, Bluetooth, lustig-Modus, ...) stehen in `game/config.toml`, nicht mehr in game.py
+- bei der exe liegt `config.toml` neben der exe; fehlt sie, wird sie beim Start mit den Standardwerten angelegt
+- Tippfehler und falsche Werte zeigt das Spiel beim Start an
+
+## exe bauen
+
+- `pip install pyinstaller pygame-ce`, dann `pyinstaller autorunner.spec` -> `dist/Rhythmus-Autorunner.exe`
+- Windows-exe nur auf Windows (oder in Wine) bauen, unter Linux kommt eine Linux-Datei raus
+- die exe legt `auto-save.sqlite` neben sich an -> Messdaten von dort einsammeln
+
 ## code-expl/ (etc.)
 
 - nur für die Erstellung wichtig -> irrelevant

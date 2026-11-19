@@ -11,3 +11,7 @@ __pycache__/
 # Messdaten spaeter bewusst entscheiden:
 # Rohdaten gehoeren zur Arbeit und sollten mitversioniert werden,
 # solange sie klein bleiben. Deshalb hier NICHT ausgeschlossen.
+
+# PyInstaller (pyinstaller autorunner.spec)
+build/
+dist/

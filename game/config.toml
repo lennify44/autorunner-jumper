@@ -1,0 +1,62 @@
+# Einstellungen fuer den Rhythmus-Autorunner
+#
+# Aendern, speichern, Spiel neu starten.
+# Die Datei liegt neben der exe. Fehlt sie, legt das Spiel sie mit den Standardwerten neu an.
+# Fehlt nur ein einzelner Wert, wird dafuer der Standardwert genommen.
+# Zeiten in Sekunden, Laengen in Pixeln.
+
+[allgemein]
+DEBUG = false                 # S spult zum Ende vor, Offset wird angezeigt
+MUTE = false
+BLUETOOTH = false             # nicht mit Bluetooth spielen (150-250 ms Latenz), nur Notloesung
+BLUETOOTH_OFFSET = 0.2        # ton kommt spaeter an, also muss das spiel auch spaeter laufen
+LUSTIG = false                # Challenge-Modus: Werte aus [lustig] ueberschreiben alles, Kalibrierung nicht noetig
+MUSIC_FILE = "game_music.wav" # wird zuerst neben der exe gesucht, sonst die eingebaute
+DB_FILE = "auto-save.sqlite"  # Messdaten; wird neben der exe angelegt, falls noch nicht da
+
+[fenster]
+WIDTH = 960                   # genau 1/4 von FHD; passt auf jeden bildschirm
+HEIGHT = 540
+FPS = 120                     # zeitliche Aufloesung = 8,3 ms
+SCALED = true                 # Fenster vergroessern, das Spiel rechnet intern weiter mit WIDTH x HEIGHT
+FULLSCREEN = false            # ganzer Bildschirm (immer vergroessert), schwarze Raender wenn das Seitenverhaeltnis nicht passt
+TEXT_COLOR = [235, 235, 240]  # RGB
+DIM_COLOR = [120, 120, 135]
+
+[physik]
+# Aendert sich die Physik, aendert sich JUMP_LEAD. Das Spiel rechnet es selbst aus und
+# speichert es pro Durchlauf in der DB -- tools/analysis.py muss dann angepasst werden.
+SCROLL_SPEED = 400            # pixel/sec
+PLAYER_X = 200                # feste Position der Figur
+GROUND_Y = 380                # Hoehe des Bodens
+PLAYER_SIZE = 40
+OBSTACLE_W = 30
+OBSTACLE_H = 60
+JUMP_VELOCITY = 1000          # Startgeschwindigkeit nach oben, Pixel/s
+GRAVITY = 4000                # Beschleunigung nach unten, Pixel/s^2
+
+[level]
+BPM = 120                     # muss zur Musik passen
+LEVEL_SEED = 42
+LEAD_IN_BEATS = 16            # beats vor dem ersten Hindernis
+SLOT_BEATS = 1
+GAP_CHOICES = [2, 2, 2, 2, 2, 2, 4, 4, 4]   # abstand zum naechsten hindernis in slots, zufaellig gezogen
+MUSIC_END = 60.0              # nach dieser Zeit kommen keine Hindernisse mehr
+
+[experiment]
+OFFSETS = [-0.150, -0.100, -0.050, 0.0, 0.050, 0.100, 0.150, 0.200]   # +=spaeter;-=frueher; ein Durchgang pro Wert
+PRACTICE_OFFSET = 0.0
+PRACTICE_TIMES = 2            # wie oft practice ist
+CALIB_COUNTIN_BEATS = 24      # bis Takt 7, wo der Beat einsetzt
+CALIB_TAP_BEATS = 16
+
+[lustig]
+# falls den probanten langweilig wird, ist das hier eine challenge fuer hinterher ;)
+# Nur aktiv bei LUSTIG = true. Hier darf jeder Wert von oben stehen.
+WIDTH = 1900
+JUMP_VELOCITY = 1300
+SCROLL_SPEED = 4000
+OBSTACLE_W = 480
+OBSTACLE_H = 120
+FPS = 240
+GAP_CHOICES = [1, 2, 2, 3]

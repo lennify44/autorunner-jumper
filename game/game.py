@@ -1,49 +1,52 @@
 import pygame
 import time
 import random
-from pathlib import Path
 import sqlite3
 import math
 from datetime import datetime
 import statistics
+import config
 #Fenster erstellen
 
 STATE_MENU, STATE_PRACTICE, STATE_BREAK, STATE_RUNNING, STATE_DONE, STATE_CALIBRATE = "menu", "practice", "break", "running", "done", "calibrate"
 
-DEBUG = True
-
-MUTE=False
-BLUETOOTH = False
-TEXT_COLOR = (235, 235, 240)
-DIM_COLOR = (120, 120, 135)
-WIDTH, HEIGHT = 960, 540 #genau 1/4 von FHD; passt auf jeden bildschirm
-FPS = 120 #zeitliche Auflösung=8,3ms bc length of frame=8,3ms
-SCROLL_SPEED = 400 #pixel/sec
-BPM = 120
+# alle einstellbaren werte stehen in config.toml (neben der exe bzw. hier neben game.py)
+cfg = config.load()
+DEBUG = cfg["DEBUG"]
+MUTE = cfg["MUTE"]
+BLUETOOTH = cfg["BLUETOOTH"]
+BLUETOOTH_OFFSET = cfg["BLUETOOTH_OFFSET"]
+LUSTIG = cfg["LUSTIG"]          # challenge-modus, die werte dafuer stehen unter [lustig]
+TEXT_COLOR = tuple(cfg["TEXT_COLOR"])
+DIM_COLOR = tuple(cfg["DIM_COLOR"])
+WIDTH, HEIGHT = cfg["WIDTH"], cfg["HEIGHT"]
+FPS = cfg["FPS"] #zeitliche Auflösung=8,3ms bc length of frame=8,3ms
+SCALED = cfg["SCALED"]
+FULLSCREEN = cfg["FULLSCREEN"]
+SCROLL_SPEED = cfg["SCROLL_SPEED"]
+BPM = cfg["BPM"]
 SECONDS_PER_BEAT = 60 / BPM     # 0,5 s bei 120 BPM, eif formatierung
-PLAYER_X = 200                  # feste Position der Figur 
-GROUND_Y = 380                  # Hoehe des Bodens
-PLAYER_SIZE = 40
-OBSTACLE_W = 30
-OBSTACLE_H = 60
+PLAYER_X = cfg["PLAYER_X"]
+GROUND_Y = cfg["GROUND_Y"]
+PLAYER_SIZE = cfg["PLAYER_SIZE"]
+OBSTACLE_W = cfg["OBSTACLE_W"]
+OBSTACLE_H = cfg["OBSTACLE_H"]
 def obst_size(x):
     return (x, GROUND_Y - OBSTACLE_H, OBSTACLE_W, OBSTACLE_H)
-LEAD_IN_BEATS = 16               # beats vor dem ersten Hindernis
-# N_OBSTACLES = 88         #anzahl obstacle-slots
-OFFSETS = [-0.150, -0.100, -0.050, 0.0, 0.050, 0.100, 0.150, 0.200]
-PRACTICE_OFFSET = 0.0           # +=später;-=früher;in sec.
-JUMP_VELOCITY = 1000           # Startgeschwindigkeit nach oben, Pixel/s
-GRAVITY = 4000                # Beschleunigung nach unten, Pixel/s²
-JUMP_DURATION = 2 * JUMP_VELOCITY / GRAVITY
-LEVEL_SEED = 42
-SLOT_BEATS = 1
-GAP_CHOICES = [2, 2, 2, 2, 2, 3, 4, 4, 4]
-MUSIC_END = 60.0
-CALIB_COUNTIN_BEATS = 24               # bis Takt 7, wo der Beat einsetzt
-CALIB_TAP_BEATS = 16
-MUSIC_PATH = Path(__file__).parent / "game_music.wav"
-DB_PATH = Path(__file__).parent / "auto-save.sqlite"
-PRACTICE_TIMES = 2 #wie oft practice ist
+LEAD_IN_BEATS = cfg["LEAD_IN_BEATS"]
+OFFSETS = cfg["OFFSETS"]
+PRACTICE_OFFSET = cfg["PRACTICE_OFFSET"]
+JUMP_VELOCITY = cfg["JUMP_VELOCITY"]
+GRAVITY = cfg["GRAVITY"]
+LEVEL_SEED = cfg["LEVEL_SEED"]
+SLOT_BEATS = cfg["SLOT_BEATS"]
+GAP_CHOICES = cfg["GAP_CHOICES"]
+MUSIC_END = cfg["MUSIC_END"]
+CALIB_COUNTIN_BEATS = cfg["CALIB_COUNTIN_BEATS"]
+CALIB_TAP_BEATS = cfg["CALIB_TAP_BEATS"]
+MUSIC_PATH = config.find_file(cfg["MUSIC_FILE"])
+DB_PATH = config.APP_DIR / cfg["DB_FILE"]
+PRACTICE_TIMES = cfg["PRACTICE_TIMES"]
 # berechnet den optimalpunkt zum springen
 def jump_lead_calc():
     """wie weit vor der Ankunft gedrückt werden muss."""
@@ -56,23 +59,6 @@ def jump_lead_calc():
 
 JUMP_DURATION = 2 * JUMP_VELOCITY / GRAVITY
 JUMP_LEAD = jump_lead_calc()
-     
-
-
-
-def lustig():
-    """falls den probanten langweilig wird, ist das hier eine challenge fuer hinterher ;)"""
-    global WIDTH, SCROLL_SPEED, FPS, JUMP_VELOCITY, OBSTACLE_W, OBSTACLE_H, JUMP_DURATION, JUMP_LEAD, GAP_CHOICES
-    WIDTH = 1900
-    JUMP_VELOCITY = 1300
-    SCROLL_SPEED = 4000
-    OBSTACLE_W = 480
-    OBSTACLE_H = 120
-    FPS = 240
-    JUMP_DURATION = 2 * JUMP_VELOCITY / GRAVITY
-    JUMP_LEAD = jump_lead_calc()
-    GAP_CHOICES = [1, 2, 2, 3]
-# lustig()
 
 def start_calib():
     global t0, calib_presses
@@ -84,13 +70,18 @@ def start_calib():
 participant_id = ""
 bluetooth_offset = 0
 if BLUETOOTH:
-    bluetooth_offset=0.2 # ton kommt spaeter an, also muss das spiel auch spaeter laufen
+    bluetooth_offset = BLUETOOTH_OFFSET # ton kommt spaeter an, also muss das spiel auch spaeter laufen
 pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512) # bereitet die einstellungen vor; muss vor init() weil der die fest macht
 rng = random.Random(LEVEL_SEED)          #Level
 pygame.init() #startet die untersysteme
 title_font = pygame.font.SysFont(None, 64) # Font size von Menu
 font = pygame.font.SysFont(None, 32)
-screen=pygame.display.set_mode((WIDTH, HEIGHT)) #erstellt bild(auch alleine). var ist für verweis auf objekt. setmode braucht tupel, desshalb doppelte klammern.
+display_flags = 0
+if SCALED:
+    display_flags |= pygame.SCALED  # grafikkarte vergroessert das bild, spiel bleibt WIDTH x HEIGHT -> vorschauzeit bleibt gleich
+if FULLSCREEN:
+    display_flags |= pygame.FULLSCREEN | pygame.SCALED  # ohne SCALED wuerde der bildschirm auf 960x540 umschalten
+screen=pygame.display.set_mode((WIDTH, HEIGHT), display_flags) #erstellt bild(auch alleine). var ist für verweis auf objekt. setmode braucht tupel, desshalb doppelte klammern.
 pygame.display.set_caption("Rhythmus-Autorunner")
 clock = pygame.time.Clock()
 obstacle_times = [] #eckige klammer is ne liste
@@ -128,6 +119,34 @@ def connect():
     cursor=conn.cursor()
     return conn, cursor
 conn, cursor = connect()
+# legt die tabellen an, falls die db neu ist (z.b. beim ersten start der exe)
+cursor.executescript("""
+CREATE TABLE IF NOT EXISTS runs (
+    run_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    participant  TEXT,
+    offset       REAL,
+    seed         INTEGER,
+    bpm          INTEGER,
+    time_started TEXT,
+    hits         INTEGER,
+    position     INTEGER,
+    calib_offset REAL,
+    calib_sd     REAL,
+    jump_lead    REAL,
+    run_nr       INTEGER
+);
+CREATE TABLE IF NOT EXISTS presses (
+    run_id   INTEGER,
+    t_press  REAL,
+    effektiv INTEGER
+);
+CREATE TABLE IF NOT EXISTS obstacles (
+    run_id    INTEGER,
+    idx       INTEGER,
+    beat_time REAL,
+    hit       INTEGER
+);
+""")
 
 cursor.execute("SELECT count(DISTINCT participant) FROM runs")
 participant_count = cursor.fetchone()[0]
@@ -211,7 +230,7 @@ while running: # damit nicht unvollständig abgebrochen wird
                     participant_id += event.unicode   
                 elif event.key == pygame.K_BACKSPACE:
                     participant_id = participant_id[:-1] # siehe code expl
-                elif event.key == pygame.K_RETURN and participant_id != "" and calib_offset is not None: # ohne kalibrierung kein start
+                elif event.key == pygame.K_RETURN and participant_id != "" and (calib_offset is not None or LUSTIG): # ohne kalibrierung kein start
                     conditions = OFFSETS[:]   #[:] macht kopie der liste damit nix kapputt
                     random.Random(int(participant_id)).shuffle(conditions) # macht shuffle
                     condition_index = 0
